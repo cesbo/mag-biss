@@ -1,0 +1,26 @@
+BISS CAS plugin for MAG-200, MAG-250
+Copyright (C) 2013, Andrey Dyldin <and@cesbo.com>
+
+INSTALL:
+Put CAS plugin into /home/default folder of MAG rootfs.
+
+USAGE:
+Key loaded by the CAS plugin from the text file,
+by default trying to read /tmp/key
+Path to the file can be changed with JavaScript method
+stb.SetAdditionalCasParam(paramName, paramValue).
+    paramName   - must be "key_file"
+    paramValue  - full path to the key-file on the MAG file system
+
+For example:
+    stb.SetAdditionalCasParam("key_file", "/custom/path/to/file.key")
+
+You can change key in the key-file before calling stb.Play(playStr) in
+the middleware with JavaScript method stb.ExecAction(action);
+For example:
+    stb.ExecAction("set_key 1122336633221166")
+
+To do that you need to append "set_key" section in the /home/default/action.sh
+
+For more information you can ask your questions on the forum
+http://cesbo.com/forum
