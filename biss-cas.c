@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013, Andrey Dyldin <and@cesbo.com>
+ * Copyright (C) 2013-2014, Andrey Dyldin <and@cesbo.com>
  */
 
 #include "MAG-CAS-plugin.h"
@@ -7,16 +7,20 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
+#include <strings.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
 
-#define DEBUG(msg...) printf(msg)
+
+// #define DEBUG(msg...) printf(msg)
+#define DEBUG(msg...) (void)0
+
 
 static STB_MAG_Cad_t cad_interface = { NULL, NULL };
-
 static char * custom_key_file = NULL;
+
 
 static uint8_t single_char_to_hex(char c)
 {
@@ -29,10 +33,12 @@ static uint8_t single_char_to_hex(char c)
     return 0;
 }
 
+
 static uint8_t char_to_hex(const char *c)
 {
     return (single_char_to_hex(c[0]) << 4) | single_char_to_hex(c[1]);
 }
+
 
 static uint8_t * str_to_hex(const char *str, uint8_t *data, size_t size)
 {
@@ -45,13 +51,16 @@ static uint8_t * str_to_hex(const char *str, uint8_t *data, size_t size)
     return data;
 }
 
+
 /* CAS */
+
 
 static int CAS_Decrypt(uint8_t *in_buffer, int length)
 {
     DEBUG("BISS: %s()\n", __FUNCTION__);
     return length;
 }
+
 
 static void CAS_Deinit(void)
 {
@@ -60,6 +69,7 @@ static void CAS_Deinit(void)
         free(custom_key_file);
 }
 
+
 static void CAS_ResetStream(void)
 {
     DEBUG("BISS: %s()\n", __FUNCTION__);
@@ -67,7 +77,9 @@ static void CAS_ResetStream(void)
     if(custom_key_file)
         key_file = custom_key_file;
 
-    int key_fd = open(key_file, O_RDONLY);
+    int key_fd = 0;
+    key_fd = open(key_file, O_RDONLY);
+
     if(key_fd > 0)
     {
         static char value[32];
@@ -89,17 +101,23 @@ static void CAS_ResetStream(void)
             return;
         }
         else
+        {
             DEBUG("Failed to set key: %s\n", key);
+        }
     }
     else
+    {
         DEBUG("Failed to read key file: %s\n", strerror(errno));
+    }
 }
+
 
 static CAS_Flags_e CAS_GetCasFlags(void)
 {
     DEBUG("BISS: %s()\n", __FUNCTION__);
     return CAS_Flags_PMT_ECM;
 }
+
 
 static void CAS_SetAdditionalParam(const char* name, const char* value)
 {
@@ -115,9 +133,11 @@ static void CAS_SetAdditionalParam(const char* name, const char* value)
     }
 }
 
+
 STB_MAG_Cas_t * CreateCasPlugin(STB_MAG_Cad_t *mag_interface, const char *ini_filename)
 {
     DEBUG("BISS: %s()\n", __FUNCTION__);
+
     if(mag_interface)
     {
         cad_interface.SetScramblingKey = mag_interface->SetScramblingKey;
@@ -135,14 +155,17 @@ STB_MAG_Cas_t * CreateCasPlugin(STB_MAG_Cad_t *mag_interface, const char *ini_fi
     PluginInterface.OnPmtChange = NULL;
     PluginInterface.ResetStream = CAS_ResetStream;
     PluginInterface.SetAdditionalParam = CAS_SetAdditionalParam;
+
     return &PluginInterface;
 }
+
 
 int GetCasApiVersion(void)
 {
     DEBUG("BISS: %s()\n", __FUNCTION__);
     return CAS_API_VERSION;
 }
+
 
 const char * GetCasPluginDescription(void)
 {
